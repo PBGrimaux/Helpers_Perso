@@ -1,0 +1,25 @@
+# Script-level config: Streamlit (>= 1.65) reads .streamlit/config.toml next to
+# the entrypoint, so this app's theme stays inside its own folder.
+
+[theme]
+base = "light"
+primaryColor = "#0071E3"
+backgroundColor = "#FFFFFF"
+secondaryBackgroundColor = "#F5F5F7"
+textColor = "#1D1D1F"
+linkColor = "#0066CC"
+borderColor = "#E5E5EA"
+dataframeBorderColor = "#E5E5EA"
+dataframeHeaderBackgroundColor = "#F5F5F7"
+showWidgetBorder = true
+baseRadius = "0.75rem"
+buttonRadius = "full"
+font = "Inter:https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap, sans-serif"
+headingFontWeights = [600, 600, 600, 600, 600, 600]
+chartCategoricalColors = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4", "#008300", "#4a3aa7", "#e34948"]
+
+[client]
+toolbarMode = "minimal"
+
+[browser]
+gatherUsageStats = false
