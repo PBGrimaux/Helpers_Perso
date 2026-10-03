@@ -173,7 +173,7 @@ def require_portfolio() -> dict:
     pf = st.session_state.get("portfolio")
     if not pf or st.session_state.get("market") is None:
         st.info("Start on the **Portfolio** page: enter your instruments and click **Load data**.", icon=":material/info:")
-        st.page_link("pages/portfolio.py", label="Go to Portfolio", icon=":material/arrow_forward:")
+        st.page_link("views/portfolio.py", label="Go to Portfolio", icon=":material/arrow_forward:")
         st.stop()
     return pf
 

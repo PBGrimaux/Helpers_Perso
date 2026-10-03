@@ -82,7 +82,7 @@ self-contained in this folder: dependencies from `requirements.txt`, theme from 
 
 ```
 app.py            entrypoint, top navigation
-pages/            one file per page
+views/            one file per page (not named pages/, which would switch on Streamlit's legacy page routing)
 core/             analytics without Streamlit: data, metrics, risk models, backtest, diversification, forecast, export
 ui/               theme, charts, components, glossary (all explanations), session state, caching
 assets/           example portfolio

@@ -290,6 +290,6 @@ if multi:
                                   key=f"pick_{ident}")
             ss.listings[ident] = cands[choice]
 
-st.page_link("pages/instruments.py", icon=":material/arrow_forward:",
+st.page_link("views/instruments.py", icon=":material/arrow_forward:",
              label="Next: compare instruments with their benchmarks" if pf.get("use_benchmarks", True)
              else "Next: analyse each instrument")
