@@ -62,10 +62,21 @@ mpc = m.compute_metrics(p_cmp, rf, level, cache.bootstrap_vol(p_cmp)) if late_be
 mb = m.compute_metrics(b, rf, level, cache.bootstrap_vol(b)) if b is not None else {}
 long_enough = not np.isnan(mpc.get("Annualised return", np.nan))
 ret_key = "Annualised return" if long_enough else "Cumulative return"
+# Forward-looking tail risk (full history, drift removed): needed for the tiles and the section below
+with st.spinner("Fitting GARCH(1,1)-t and simulating 10,000 paths…"):
+    g_p = cache.garch_es(p_full, level)
+    g_b = cache.garch_es(b_full, level) if b_full is not None else None
+
+
+def _es_1y(g):
+    return g["table"].loc["1 year", "ES"] if g is not None and len(g["table"]) else None
+
+
 kpi_row([
     ("Return p.a." if long_enough else "Return (cumulative)", mpc[ret_key], "pct", mb.get(ret_key), "normal"),
     ("Volatility", mpc["Volatility (ann.)"], "pct", mb.get("Volatility (ann.)"), "inverse"),
-    ("Max drawdown", mpc["Max drawdown"], "pct", mb.get("Max drawdown"), "inverse"),
+    ("Max drawdown", mpc["Max drawdown"], "pct", mb.get("Max drawdown"), "normal"),
+    (f"Expected shortfall 1y ({level:.1%})", _es_1y(g_p), "pct", _es_1y(g_b) if b is not None else None, "normal"),
     ("Sharpe ratio", mpc["Sharpe ratio"], "ratio", mb.get("Sharpe ratio"), "normal"),
 ])
 
@@ -144,9 +155,6 @@ note(f"Weekly data. Volatility annualised with √52. Bootstrap vol: stationary 
 
 # ── forward-looking risk ─────────────────────────────────────────────────
 section("Forward-looking risk (GARCH Monte Carlo, drift removed)", "var-es-garch")
-with st.spinner("Fitting GARCH(1,1)-t and simulating 10,000 paths…"):
-    g_p = cache.garch_es(p_full, level)
-    g_b = cache.garch_es(b_full, level) if b_full is not None else None
 cols = st.columns(2 if g_b else 1)
 for col, name, g in zip(cols, [sym, bsym], [g_p, g_b]):
     if g is None:
@@ -166,7 +174,7 @@ for col, name, g in zip(cols, [sym, bsym], [g_p, g_b]):
             parts.append(f"persistence {prm['persistence']:.3f} · Student-t ν = {prm['nu']:.1f}")
         if parts:
             note(" · ".join(parts).capitalize())
-note(f"VaR = loss not exceeded with {level:.1%} probability; ES = average loss beyond the VaR, both as a % loss. "
+note(f"VaR = loss not exceeded with {level:.1%} probability; ES = average return in the worst cases beyond it; both are negative returns (losses). "
      "The average trend is removed so that the risk is not offset by past gains; the simulation starts from "
      "today's volatility, so these numbers move with market stress.")
 

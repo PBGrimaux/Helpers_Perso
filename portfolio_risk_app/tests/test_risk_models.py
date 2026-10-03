@@ -33,8 +33,8 @@ def test_garch_es_close_to_theory_on_iid_t():
     q = stats.t.ppf(a, nu)
     es_std = (nu + q**2) / (nu - 1) * stats.t.pdf(q, nu) / a * np.sqrt((nu - 2) / nu)
     theo = -np.expm1(-es_std * sigma)
-    assert out["table"].loc["1 week", "ES"] == pytest.approx(theo, rel=0.2)
-    assert (out["table"]["ES"] > out["table"]["VaR"]).all()
+    assert out["table"].loc["1 week", "ES"] == pytest.approx(-theo, rel=0.2)
+    assert (out["table"]["ES"] < out["table"]["VaR"]).all()
 
 
 def test_garch_falls_back_on_short_history():
@@ -78,9 +78,9 @@ def test_garch_es_ignores_drift_and_exceeds_volatility():
     assert out["params"]["drift_removed_ann"] == pytest.approx(0.20, abs=0.04)
     vol_1y = t.loc["1 year", "Volatility"]
     assert vol_1y == pytest.approx(0.16, rel=0.25)
-    assert t.loc["1 year", "ES"] > 1.5 * vol_1y          # ~2σ in log terms, less once converted to % loss
-    assert (t["ES"] >= t["VaR"]).all()
-    assert t["ES"].is_monotonic_increasing                # longer horizon, larger tail loss
+    assert t.loc["1 year", "ES"] < -1.5 * vol_1y         # loss of ~2σ in log terms, less once in % loss
+    assert (t["ES"] <= t["VaR"]).all() and (t["VaR"] < 0).all()
+    assert t["ES"].is_monotonic_decreasing                # longer horizon, larger tail loss
 
 
 def test_simulate_garch_without_arch_terms_is_iid():

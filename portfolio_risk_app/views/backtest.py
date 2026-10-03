@@ -16,6 +16,8 @@ from ui.components import (
 )
 from ui import glossary
 
+ES_LEVEL = 0.95
+
 RULE_LABELS = {
     "drift": "Let it drift (buy and hold)",
     "weekly": "Rebalance every week",
@@ -106,10 +108,21 @@ colors = {"Portfolio": theme.PORTFOLIO, "Benchmark": theme.BENCHMARK}
 
 mp = m.compute_metrics(nav_p, rf, 0.95, cache.bootstrap_vol(nav_p))
 mb = m.compute_metrics(nav_b, rf, 0.95, cache.bootstrap_vol(nav_b)) if has_bench else {}
+# Forward-looking 1-year tail risk of the portfolio (GARCH-t Monte Carlo on its weekly NAV, drift removed)
+with st.spinner("Estimating the portfolio's expected shortfall…"):
+    g_p = cache.garch_es(nav_p, ES_LEVEL)
+    g_b = cache.garch_es(nav_b, ES_LEVEL) if has_bench else None
+
+
+def _es_1y(g):
+    return g["table"].loc["1 year", "ES"] if g is not None and len(g["table"]) else None
+
+
 kpi_row([
     ("Return p.a.", mp["Annualised return"], "pct", mb.get("Annualised return"), "normal"),
     ("Volatility", mp["Volatility (ann.)"], "pct", mb.get("Volatility (ann.)"), "inverse"),
-    ("Max drawdown", mp["Max drawdown"], "pct", mb.get("Max drawdown"), "inverse"),
+    ("Max drawdown", mp["Max drawdown"], "pct", mb.get("Max drawdown"), "normal"),
+    (f"Expected shortfall 1y ({ES_LEVEL:.0%})", _es_1y(g_p), "pct", _es_1y(g_b), "normal"),
     ("Sharpe ratio", mp["Sharpe ratio"], "ratio", mb.get("Sharpe ratio"), "normal"),
 ])
 

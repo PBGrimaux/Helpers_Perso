@@ -4,7 +4,7 @@ Performance, risk and relative metrics on weekly price series.
 Conventions (aligned with the Trend Following backtest/metrics.py):
 - annualised return = (S_T / S_0) ^ (365 / nb_calendar_days) - 1
 - volatility annualised with sqrt(52) on simple weekly returns
-- drawdowns and ES are reported as positive numbers (0.15 = 15% loss)
+- losses (max drawdown, VaR, ES) are reported as negative returns (-0.15 = a 15% loss)
 - windows shorter than one year: no annualised return and no return-based ratios
 """
 
@@ -62,14 +62,14 @@ def drawdown_series(prices: pd.Series) -> pd.Series:
 
 def max_drawdown_details(prices: pd.Series) -> dict:
     """
-    Maximum drawdown (positive), peak date, trough date, recovery date
+    Maximum drawdown (negative, e.g. -0.30), peak date, trough date, recovery date
     (None if not recovered) and the number of weeks from trough to recovery.
     """
     prices = prices.dropna()
     dd = drawdown_series(prices)
     trough = dd.idxmin()
-    mdd = -dd.min()
-    if mdd <= 0:
+    mdd = dd.min()
+    if mdd >= 0:
         return {"mdd": 0.0, "peak": None, "trough": None, "recovery": None, "recovery_weeks": None}
     peak = prices.loc[:trough].idxmax()
     after = prices.loc[trough:]
@@ -80,12 +80,12 @@ def max_drawdown_details(prices: pd.Series) -> dict:
 
 
 def historical_var_es(returns: pd.Series, level: float = 0.95) -> tuple[float, float]:
-    """Historical VaR and expected shortfall of weekly returns, as positive losses."""
+    """Historical VaR and expected shortfall of weekly returns, as negative returns."""
     r = returns.dropna().to_numpy()
     assert len(r) > 0, "No returns"
     q = np.quantile(r, 1 - level)
     tail = r[r <= q]
-    return float(-q), float(-tail.mean())
+    return float(q), float(tail.mean())
 
 
 def rf_per_period(rf_annual: float, periods_per_year: float = PERIODS_PER_YEAR) -> float:
@@ -220,7 +220,7 @@ def compute_metrics(
     if long_enough:
         out["Sharpe ratio"] = (ann_ret - rf_annual) / vol if vol > 0 else np.nan
         out["Sortino ratio"] = (ann_ret - rf_annual) / dsd if dsd > 0 else np.nan
-        out["Calmar ratio"] = ann_ret / dd["mdd"] if dd["mdd"] > 0 else np.nan
+        out["Calmar ratio"] = ann_ret / abs(dd["mdd"]) if dd["mdd"] < 0 else np.nan
     else:
         out["Sharpe ratio"] = out["Sortino ratio"] = out["Calmar ratio"] = np.nan
     return out

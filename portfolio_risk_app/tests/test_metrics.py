@@ -21,7 +21,7 @@ def test_max_drawdown_details():
     idx = pd.date_range("2020-01-03", periods=6, freq="W-FRI")
     p = pd.Series([100, 120, 90, 60, 110, 125], idx)
     d = m.max_drawdown_details(p)
-    assert d["mdd"] == pytest.approx(0.5)
+    assert d["mdd"] == pytest.approx(-0.5)
     assert d["peak"] == idx[1] and d["trough"] == idx[3] and d["recovery"] == idx[5]
 
 
@@ -29,7 +29,7 @@ def test_historical_es_above_var():
     rng = np.random.default_rng(0)
     r = pd.Series(rng.standard_t(4, 5000) * 0.02)
     var, es = m.historical_var_es(r, 0.95)
-    assert es > var > 0
+    assert es < var < 0
 
 
 def test_short_window_not_annualised(weekly_dates):

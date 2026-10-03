@@ -9,7 +9,7 @@ from ui import glossary
 
 KPI_LABELS = [
     "Return p.a.", "Return (cumulative)", "Volatility", "Max drawdown", "Sharpe ratio",
-    "Portfolio volatility", "Diversification ratio", "Effective nb of bets", "Avg. correlation",
+    "Expected shortfall 1y", "Portfolio volatility", "Diversification ratio", "Effective nb of bets", "Avg. correlation",
     "Median final wealth", "Chance of reaching target", "Chance of ending below invested",
     "Chance of running out", "Median return p.a.",
     "Annualised turnover", "Total fees paid (% of start)", "Number of rebalances",

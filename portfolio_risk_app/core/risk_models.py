@@ -64,10 +64,10 @@ def bootstrap_volatility(
 
 
 def _var_es_from_samples(horizon_returns: np.ndarray, level: float) -> tuple[float, float]:
-    """VaR and ES of simulated returns, reported as positive losses."""
+    """VaR and ES of simulated returns, reported as negative returns (losses)."""
     q = np.quantile(horizon_returns, 1 - level)
     tail = horizon_returns[horizon_returns <= q]
-    return float(-q), float(-tail.mean())
+    return float(q), float(tail.mean())
 
 
 def fit_garch_t(demeaned_logret: np.ndarray) -> dict:

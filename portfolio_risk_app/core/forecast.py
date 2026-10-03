@@ -122,7 +122,7 @@ class ForecastResult:
         invested = self.net_invested[-1] / (self.deflator()[-1] if real else 1.0)
         tw = self.twr
         run_max = np.maximum.accumulate(tw, axis=1)
-        mdd = 1 - (tw / run_max).min(axis=1)
+        mdd = (tw / run_max).min(axis=1) - 1  # negative: -0.25 = fell 25% from a peak
         n_tail = max(1, int(0.05 * len(wT)))
         out = {
             "Median terminal wealth": float(np.median(wT)),
@@ -136,7 +136,7 @@ class ForecastResult:
             "P(ending below amount invested)": float((wT < invested).mean()) if invested > 0 else float("nan"),
             "P(depletion)": float(self.depleted.mean()),
             "Median max drawdown": float(np.median(mdd)),
-            "Max drawdown (95th pct)": float(np.percentile(mdd, 95)),
+            "Max drawdown (95th pct)": float(np.percentile(mdd, 5)),  # the 5% worst paths
         }
         if target:
             out["P(reaching target)"] = float((wT >= target).mean())

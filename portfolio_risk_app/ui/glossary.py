@@ -220,7 +220,7 @@ SECTIONS = [
                     "have suffered before prices recovered."
                 ),
                 "computed": (
-                    "For each week, price / highest price so far − 1; the maximum drawdown is the deepest value. "
+                    "For each week, price / highest price so far − 1; the maximum drawdown is the deepest (most negative) value, e.g. −35%. "
                     "Trough = date of the low point; recovery = weeks from the trough until the previous peak is "
                     "regained ('–' if not yet recovered)."
                 ),
@@ -239,18 +239,18 @@ SECTIONS = [
                     "average loss in the remaining worst weeks — 'when it goes badly, how badly on average?'."
                 ),
                 "computed": (
-                    "From the past weekly returns: VaR = 5th percentile of returns (as a loss); ES = average of the "
+                    "From the past weekly returns: VaR = 5th percentile of returns; ES = average of the "
                     "returns below that percentile."
                 ),
                 "reading": (
-                    "VaR 95% of 3% means about one week in twenty loses more than 3%. ES is always larger than VaR "
+                    "Losses are shown as negative returns. VaR 95% of −3% means about one week in twenty loses more than 3%. ES is always below (more negative than) VaR "
                     "and is the better measure of tail risk, because it looks at how deep the bad weeks go."
                 ),
             },
             {
                 "anchor": "var-es-garch",
                 "title": "Forward-looking VaR and ES (GARCH Monte Carlo)",
-                "labels": ["Forward-looking risk", "VaR", "ES"],
+                "labels": ["Forward-looking risk", "VaR", "ES", "Expected shortfall 1y"],
                 "meaning": (
                     "Tail risk for the next week, month and year given today's market conditions, rather than the "
                     "average of the past."
@@ -266,13 +266,13 @@ SECTIONS = [
                     "Student-t shock is drawn, the simulated return is volatility × shock, and that return feeds the "
                     "variance of the following week — a crash raises the risk of the weeks after it. "
                     "4) **Read the tail.** Over 1 week, 1 month and 1 year: return = exp(sum of weekly log returns) − 1; "
-                    "VaR = the loss exceeded in 5% of paths (at 95%), ES = the average loss in those worst 5%. "
+                    "VaR = the return below which the worst 5% of paths fall (at 95%), ES = the average return of those worst 5%, both negative. "
                     "With less than two years of data, or if the fitted process is not stable (α + β ≥ 1), "
                     "de-drifted past returns are resampled instead."
                 ),
                 "reading": (
-                    "Without drift, the 1-year ES at 95% is typically around 1.7–2 times the yearly volatility "
-                    "(in % loss). When markets are stressed, today's volatility is above its long-run level and these "
+                    "Without drift, the 1-year ES at 95% is typically a loss of about 1.7–2 times the yearly volatility "
+                    "(e.g. −29% for 16% volatility). When markets are stressed, today's volatility is above its long-run level and these "
                     "numbers rise above the historical ones; in calm markets they are lower. 'Persistence' (α + β) "
                     "close to 1 means shocks fade slowly; a low ν means fat tails. The volatility over the horizon is "
                     "shown next to VaR and ES so they can be compared on the same scale."

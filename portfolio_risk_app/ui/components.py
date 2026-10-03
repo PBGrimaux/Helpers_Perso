@@ -120,7 +120,7 @@ def kpi_row(items: list[tuple[str, float, str, float | None, str]]) -> None:
             diff = value - bench
             delta = f"{diff:+.1%} vs benchmark" if kind == "pct" else f"{diff:+.2f} vs benchmark"
         col.metric(label, fmt_value(value, kind), delta=delta, delta_color=delta_color,
-                   help=glossary.help_text(label))
+                   help=glossary.help_text(label) or glossary.help_text(label.split(" (")[0]))
 
 
 def price_index_notice(instruments: list[dict], symbols: list[str] | None = None) -> None:
