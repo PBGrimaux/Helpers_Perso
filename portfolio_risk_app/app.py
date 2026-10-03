@@ -20,7 +20,7 @@ APP_PACKAGES = ("core", "ui")
 
 def _source_fingerprint() -> tuple:
     files = sorted(p for pkg in APP_PACKAGES for p in (APP_DIR / pkg).rglob("*.py"))
-    return tuple((str(p), os.path.getmtime(p)) for p in files)
+    return tuple((str(p), os.path.getmtime(p), os.path.getsize(p)) for p in files)
 
 
 def _drop_stale_app_modules() -> None:
@@ -28,14 +28,18 @@ def _drop_stale_app_modules() -> None:
     Streamlit re-executes page scripts on every run but keeps imported modules
     in memory. After a new commit is pulled (Streamlit Cloud) a page could then
     run against an old copy of core/ or ui/ and fail with an ImportError. The
-    fingerprint (file list + modification times) of core/ and ui/ is kept for
+    fingerprint (file list + modification times + sizes) of core/ and ui/ is kept for
     the life of the server process; when it changes, all app modules are
     forgotten so they are imported fresh and consistently.
     """
     current = _source_fingerprint()
     previous = getattr(sys, "_portfolio_app_fingerprint", None)
-    if previous is not None and previous != current:
-        for name in [n for n in sys.modules if n.split(".")[0] in APP_PACKAGES]:
+    loaded = [n for n in sys.modules if n.split(".")[0] in APP_PACKAGES]
+    # No fingerprint but modules already loaded: they were imported by an older
+    # version of this file (e.g. the server that just pulled this commit), so
+    # their age is unknown — reload them to be safe.
+    if loaded and (previous is None or previous != current):
+        for name in loaded:
             del sys.modules[name]
     sys._portfolio_app_fingerprint = current
 
