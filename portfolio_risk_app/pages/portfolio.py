@@ -8,7 +8,7 @@ import streamlit as st
 from core.export import portfolio_from_json, portfolio_to_json
 from core.identifiers import Listing
 from ui import cache
-from ui.components import fmt_value, page_header, section, note
+from ui.components import explain, fmt_value, note, page_header, price_index_notice, section
 from ui.state import (
     BASE_CURRENCIES, MAX_INSTRUMENTS, apply_portfolio_file, bump_editors, clean_lines,
     lines_signature, load_example,
@@ -28,7 +28,7 @@ if ss.page_entered:
     bump_editors()
 
 # ── settings ─────────────────────────────────────────────────────────────
-c1, c2, _ = st.columns([1, 1, 2])
+c1, c2, c3 = st.columns([1, 1, 2])
 base = c1.selectbox(
     "Base currency", BASE_CURRENCIES,
     index=BASE_CURRENCIES.index(ss.settings.get("base_currency", "CHF")),
@@ -39,7 +39,14 @@ rf = c2.number_input(
     min_value=-2.0, max_value=15.0, step=0.25, format="%.2f",
     help="Used for Sharpe, Sortino and alpha. A constant rate in the base currency.",
 )
-ss.settings = ss.settings | {"base_currency": base, "risk_free": rf / 100}
+c3.markdown("<div style='height:1.9rem'></div>", unsafe_allow_html=True)
+use_bench = c3.toggle(
+    "Compare with benchmarks", value=bool(ss.settings.get("use_benchmarks", True)),
+    help="Switch off to analyse the instruments and the portfolio on their own, without any benchmark "
+         "(the Benchmark column is then ignored and nothing is downloaded for it).",
+)
+ss.settings = ss.settings | {"base_currency": base, "risk_free": rf / 100, "use_benchmarks": use_bench}
+sig_key = f"{base}|bench={use_bench}"
 
 # ── editor ───────────────────────────────────────────────────────────────
 section("Instruments")
@@ -49,6 +56,7 @@ edited = st.data_editor(
     num_rows="dynamic",
     hide_index=True,
     width="stretch",
+    column_order=None if use_bench else ["Instrument", "Weight %"],
     column_config={
         "Instrument": st.column_config.TextColumn(
             "Instrument (ticker or ISIN)", required=True,
@@ -63,11 +71,17 @@ edited = st.data_editor(
 )
 ss.lines = edited
 lines = clean_lines(edited)
+single = len(lines) == 1
+if single:
+    # A one-line portfolio is 100% in that line, whatever weight was typed.
+    lines.loc[0, "Weight %"] = 100.0
 total = lines["Weight %"].sum()
 
 w1, w2, _ = st.columns([1.2, 1, 3])
 ok_total = abs(total - 100) < 0.01
 w1.markdown(f"**Total weight:** {total:.2f}%" + ("" if ok_total else "  ·  must equal 100%"))
+if single:
+    note("Single instrument: it is analysed as a 100% portfolio.")
 if w2.button("Normalise to 100%", disabled=ok_total or total <= 0, icon=":material/balance:"):
     norm = lines.copy()
     norm["Weight %"] = norm["Weight %"] / total * 100
@@ -100,7 +114,9 @@ def _default_pick(cands: list[dict], base_ccy: str) -> dict:
     return cands[0]
 
 
-def _load(df: pd.DataFrame, base_ccy: str) -> None:
+def _load(df: pd.DataFrame, base_ccy: str, with_bench: bool) -> None:
+    if not with_bench:
+        df = df.assign(Benchmark="")
     identifiers = list(dict.fromkeys(list(df["Instrument"]) + [b for b in df["Benchmark"] if b]))
     with st.status("Loading data…", expanded=True) as status:
         unresolved = []
@@ -162,6 +178,7 @@ def _load(df: pd.DataFrame, base_ccy: str) -> None:
                 "name": L.get("name") or sym,
                 "currency": L.get("currency", ""),
                 "quote_type": L.get("quote_type", ""),
+                "price_index": Listing.from_dict(L).is_price_index,
                 "weight": row["Weight %"] / 100,
                 "benchmark": bsym,
                 "benchmark_name": (B.get("name") or bsym) if bsym else None,
@@ -174,8 +191,9 @@ def _load(df: pd.DataFrame, base_ccy: str) -> None:
             return
 
         ss.market = md
-        ss.portfolio = {"instruments": instruments, "base": base_ccy, "rf": ss.settings["risk_free"]}
-        ss.loaded_signature = lines_signature(ss.lines, base_ccy, ss.listings)
+        ss.portfolio = {"instruments": instruments, "base": base_ccy, "rf": ss.settings["risk_free"],
+                        "use_benchmarks": with_bench}
+        ss.loaded_signature = lines_signature(ss.lines, sig_key, ss.listings)
         ss.forecast_result = None
         status.update(label="Data loaded", state="complete", expanded=False)
 
@@ -188,7 +206,7 @@ if a1.button("Load data", type="primary", icon=":material/cloud_download:", widt
         for e in errs:
             st.error(e)
     else:
-        _load(lines, base)
+        _load(lines, base, use_bench)
 
 if a2.button("Load example", icon=":material/auto_awesome:", width="stretch"):
     load_example()
@@ -217,7 +235,7 @@ md, pf = ss.market, ss.portfolio
 if md is None or pf is None:
     st.stop()
 
-if lines_signature(ss.lines, base, ss.listings) != ss.loaded_signature:
+if lines_signature(ss.lines, sig_key, ss.listings) != ss.loaded_signature:
     st.warning("Inputs changed since the last load — click **Load data** to refresh the analysis.", icon=":material/sync_problem:")
 
 section("Loaded data")
@@ -226,13 +244,15 @@ rows = []
 for ins in pf["instruments"]:
     info = md.info[ins["symbol"]]
     notes = []
+    if ins.get("price_index"):
+        notes.append("price index (no dividends)")
     if ins["benchmark_price_index"]:
         notes.append("benchmark is a price index (no dividends)")
     if info.get("fx_truncated"):
         notes.append("history cut by FX availability")
     if (today - info["last_daily_date"]).days > STALE_DAYS:
         notes.append(f"last price {info['last_daily_date']:%d.%m.%Y}")
-    if not ins["benchmark"]:
+    if not ins["benchmark"] and pf.get("use_benchmarks", True):
         notes.append("no benchmark")
     b_info = md.info.get(ins["benchmark"]) if ins["benchmark"] else None
     rows.append({
@@ -246,11 +266,16 @@ for ins in pf["instruments"]:
         "Benchmark from": fmt_value(b_info["first_date"], "date") if b_info else "–",
         "Notes": "; ".join(notes),
     })
-st.dataframe(pd.DataFrame(rows), hide_index=True, width="stretch",
+summary_df = pd.DataFrame(rows)
+if not pf.get("use_benchmarks", True):
+    summary_df = summary_df.drop(columns=["Benchmark", "Benchmark from"])
+st.dataframe(summary_df, hide_index=True, width="stretch",
              column_config={"Name": st.column_config.TextColumn(width="medium"),
                             "Notes": st.column_config.TextColumn(width="large")})
 note(f"Weekly prices (Friday close) in {pf['base']}. Latest week: {md.weekly.index[-1]:%d.%m.%Y}.")
+explain("currency-conversion", "How prices are converted into one currency ↗")
 
+price_index_notice(pf["instruments"])
 for w in md.warnings:
     st.warning(w, icon=":material/warning:")
 
@@ -265,4 +290,6 @@ if multi:
                                   key=f"pick_{ident}")
             ss.listings[ident] = cands[choice]
 
-st.page_link("pages/instruments.py", label="Next: compare instruments with their benchmarks", icon=":material/arrow_forward:")
+st.page_link("pages/instruments.py", icon=":material/arrow_forward:",
+             label="Next: compare instruments with their benchmarks" if pf.get("use_benchmarks", True)
+             else "Next: analyse each instrument")

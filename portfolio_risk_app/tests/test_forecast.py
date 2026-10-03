@@ -65,3 +65,14 @@ def test_portfolio_json_roundtrip():
     assert back["expected_returns"]["AGG"] == 0.04
     assert back["cash_flows"].iloc[0]["Amount"] == 5.0
     assert len(to_excel({"a": lines, "b": cf})) > 0
+
+
+def test_monthly_plan_payments():
+    dates = fc.simulation_dates(pd.Timestamp("2026-10-02"), 12)
+    plan = fc.monthly_plan(500.0, pd.Timestamp("2026-11-01"), 10)
+    sched = fc.cash_flow_schedule(plan, dates)
+    assert (sched > 0).sum() == 120
+    assert sched.sum() == pytest.approx(120 * 500.0)
+    assert fc.monthly_plan(0.0, pd.Timestamp("2026-11-01"), 10).empty
+    grown = fc.cash_flow_schedule(fc.monthly_plan(500.0, pd.Timestamp("2026-11-01"), 2, 0.10), dates)
+    assert grown[grown > 0][-1] > 500 * 1.09

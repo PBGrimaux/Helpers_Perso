@@ -78,6 +78,20 @@ def cash_flow_schedule(flows: pd.DataFrame | None, dates: pd.DatetimeIndex) -> n
     return out
 
 
+def monthly_plan(amount: float, start: pd.Timestamp, years: int, yearly_increase: float = 0.0) -> pd.DataFrame:
+    """
+    A regular monthly contribution (or withdrawal if negative) as one row of the
+    cash-flow table: `amount` every month from `start` for `years` years,
+    growing by `yearly_increase` per year. Empty frame when amount is 0.
+    """
+    if not amount:
+        return pd.DataFrame(columns=["Start", "End", "Amount", "Frequency", "Indexation"])
+    start = pd.Timestamp(start)
+    end = start + pd.DateOffset(years=years) - pd.Timedelta(days=1)
+    return pd.DataFrame([{"Start": start, "End": end, "Amount": float(amount),
+                          "Frequency": "Monthly", "Indexation": float(yearly_increase)}])
+
+
 @dataclass
 class ForecastResult:
     dates: pd.DatetimeIndex

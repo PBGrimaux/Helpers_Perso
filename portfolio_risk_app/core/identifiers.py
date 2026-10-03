@@ -13,7 +13,10 @@ import yfinance as yf
 ISIN_RE = re.compile(r"^[A-Z]{2}[A-Z0-9]{9}[0-9]$")
 
 # Words in an index name that indicate dividends are reinvested.
-_TOTAL_RETURN_HINTS = ("total return", "net return", "gross return", " tr ", " nr ", "(tr)", "(nr)")
+_TOTAL_RETURN_HINTS = ("total return", "net return", "gross return", "performance", " tr ", " nr ", "(tr)", "(nr)")
+# Yahoo indices that reinvest dividends although their name does not say so
+# (the German DAX family are "performance" indices).
+_KNOWN_TOTAL_RETURN = {"^GDAXI", "^MDAXI", "^SDAXI", "^TECDAX"}
 
 
 @dataclass
@@ -35,7 +38,7 @@ class Listing:
     @property
     def is_price_index(self) -> bool:
         """True for an index that most likely excludes dividends."""
-        if self.quote_type.upper() != "INDEX":
+        if self.quote_type.upper() != "INDEX" or self.symbol.upper() in _KNOWN_TOTAL_RETURN:
             return False
         name = f" {self.name.lower()} "
         return not any(h in name for h in _TOTAL_RETURN_HINTS)

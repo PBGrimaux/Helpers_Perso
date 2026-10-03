@@ -47,6 +47,12 @@ p.note {{ color: {TEXT_SECONDARY}; font-size: 0.86rem; }}
 [data-testid="stMetricLabel"] p {{ color: {TEXT_SECONDARY}; font-size: 0.84rem; }}
 [data-testid="stMetricValue"] {{ font-size: 1.55rem; font-weight: 600; }}
 [data-testid="stExpander"] details {{ border-radius: 14px; }}
+a.explain {{
+    text-transform: none; letter-spacing: 0; font-weight: 500; font-size: 0.8rem;
+    color: {ACCENT}; text-decoration: none; margin-left: 0.6rem;
+}}
+p.note a.explain {{ margin-left: 0; }}
+a.explain:hover {{ text-decoration: underline; }}
 .section-label {{
     text-transform: uppercase; letter-spacing: 0.06em; font-size: 0.75rem;
     color: {TEXT_SECONDARY}; font-weight: 600; margin: 1.6rem 0 0.2rem 0;

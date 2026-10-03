@@ -73,3 +73,5 @@ def test_price_index_flag():
     assert Listing("^GSPC", "S&P 500", quote_type="INDEX").is_price_index
     assert not Listing("^SP500TR", "S&P 500 (TR)", quote_type="INDEX").is_price_index
     assert not Listing("SPY", "SPDR", quote_type="ETF").is_price_index
+    assert not Listing("^GDAXI", "DAX P", quote_type="INDEX").is_price_index
+    assert Listing("^SSMI", "SMI PR", quote_type="INDEX").is_price_index

@@ -1,16 +1,49 @@
 {
   "schema_version": 1,
-  "settings": {"base_currency": "CHF", "risk_free": 0.0},
+  "settings": {
+    "base_currency": "CHF",
+    "risk_free": 0.0,
+    "monthly_plan": {
+      "amount": 1000.0,
+      "start": "2026-11-01",
+      "years": 10,
+      "increase": 0.01
+    }
+  },
   "lines": [
-    {"Instrument": "IE00B4L5Y983", "Benchmark": "URTH", "Weight %": 40.0},
-    {"Instrument": "CSSMI.SW", "Benchmark": "^SSMI", "Weight %": 15.0},
-    {"Instrument": "AGG", "Benchmark": "BND", "Weight %": 25.0},
-    {"Instrument": "IEMG", "Benchmark": "EEM", "Weight %": 10.0},
-    {"Instrument": "GLD", "Benchmark": "", "Weight %": 10.0}
+    {
+      "Instrument": "IE00B4L5Y983",
+      "Benchmark": "URTH",
+      "Weight %": 40.0
+    },
+    {
+      "Instrument": "CSSMI.SW",
+      "Benchmark": "^SSMI",
+      "Weight %": 15.0
+    },
+    {
+      "Instrument": "AGG",
+      "Benchmark": "BND",
+      "Weight %": 25.0
+    },
+    {
+      "Instrument": "IEMG",
+      "Benchmark": "EEM",
+      "Weight %": 10.0
+    },
+    {
+      "Instrument": "GLD",
+      "Benchmark": "",
+      "Weight %": 10.0
+    }
   ],
   "listings": {},
-  "expected_returns": {"IWDA.L": 0.06, "CSSMI.SW": 0.05, "AGG": 0.03, "IEMG": 0.065, "GLD": 0.03},
-  "cash_flows": [
-    {"Start": "2027-01-01", "End": "2036-12-31", "Amount": 1000.0, "Frequency": "Monthly", "Indexation": 0.01}
-  ]
+  "expected_returns": {
+    "IWDA.L": 0.06,
+    "CSSMI.SW": 0.05,
+    "AGG": 0.03,
+    "IEMG": 0.065,
+    "GLD": 0.03
+  },
+  "cash_flows": []
 }
