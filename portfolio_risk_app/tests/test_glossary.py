@@ -40,6 +40,6 @@ def test_anchors_unique_and_entries_complete():
     assert len(anchors) == len(set(anchors))
     for s in glossary.SECTIONS:
         for e in s["entries"]:
-            assert e["meaning"] and e["computed"] and e["reading"], e["anchor"]
+            assert e["plain"] and e["meaning"] and e["computed"] and e["reading"], e["anchor"]
             assert glossary.url(e["anchor"]) == f"/methodology#{e['anchor']}"
     assert np.isfinite(len(glossary.short("Sharpe ratio")))

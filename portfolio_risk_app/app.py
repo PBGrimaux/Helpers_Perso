@@ -41,6 +41,10 @@ def _drop_stale_app_modules() -> None:
     if loaded and (previous is None or previous != current):
         for name in loaded:
             del sys.modules[name]
+        # Cached results were computed by the old code: Streamlit only checks the
+        # cached wrapper's own source (ui/cache.py), not the core/ functions it
+        # calls, so a change in core/ would otherwise keep serving stale numbers.
+        st.cache_data.clear()
     sys._portfolio_app_fingerprint = current
 
 

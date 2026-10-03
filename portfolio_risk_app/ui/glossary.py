@@ -6,8 +6,10 @@ Methodology page. The pages link to `/methodology#<anchor>`; the Methodology
 page renders the same entries, so a definition is written once.
 
 Entry fields
+- plain:    explanation for someone with no finance background (shown first,
+            and used as the ⓘ tooltip)
 - labels:   the labels used in the UI that point to this entry
-- meaning:  what it tells an investor (first sentence = short tooltip)
+- meaning:  what it tells an investor
 - computed: how the app computes it
 - reading:  how to interpret it, rules of thumb, pitfalls
 """
@@ -24,6 +26,7 @@ SECTIONS = [
             {
                 "anchor": "price-vs-total-return",
                 "title": "Price index vs total-return index",
+                "plain": 'Companies pay part of their profits to shareholders as dividends. A price index pretends those payments never happened; a total-return index (and any fund you can buy) keeps them. Comparing the two is like comparing a salary with and without the yearly bonus: the price index always looks a bit poorer than reality.',
                 "labels": ["Price index"],
                 "meaning": (
                     "A price index only follows the prices of its components; a total-return index also adds back "
@@ -55,6 +58,7 @@ SECTIONS = [
             {
                 "anchor": "currency-conversion",
                 "title": "Currency conversion",
+                "plain": 'Everything is shown in your own currency, as if you had bought it with your own money. If you invest in US shares from Switzerland, you gain or lose on the shares and also on the dollar against the franc.',
                 "labels": ["Currency"],
                 "meaning": (
                     "All prices are expressed in the base currency you choose, so every result includes the effect "
@@ -73,6 +77,7 @@ SECTIONS = [
             {
                 "anchor": "weekly-data",
                 "title": "Weekly data and horizons",
+                "plain": 'The app looks at one price per week, the Friday close, which is enough to see the trend and the risk without the noise of every single day. Over less than a year you see the total gain; over several years you see the average gain per year.',
                 "labels": ["Returns across horizons", "Horizon"],
                 "meaning": (
                     "All statistics use weekly prices (Friday close), which smooth out day-to-day noise and "
@@ -97,6 +102,7 @@ SECTIONS = [
             {
                 "anchor": "cumulative-return",
                 "title": "Cumulative return",
+                "plain": "How much your money grew in total. +50% means 1'000 became 1'500 over the period.",
                 "labels": ["Cumulative return", "Return (cumulative)", "Excess return (cum.)"],
                 "meaning": "The total gain or loss over the whole period, dividends included.",
                 "computed": "Final price / first price − 1.",
@@ -108,6 +114,7 @@ SECTIONS = [
             {
                 "anchor": "annualised-return",
                 "title": "Annualised return",
+                "plain": 'The average growth per year. 7% a year means that, on average, each year added 7% to the money of the year before — roughly doubling it in ten years.',
                 "labels": ["Annualised return", "Return p.a.", "Excess return (ann.)"],
                 "meaning": (
                     "The constant yearly return that would have produced the same final result: the average speed "
@@ -122,6 +129,7 @@ SECTIONS = [
             {
                 "anchor": "best-worst-week",
                 "title": "Best week, worst week, positive weeks",
+                "plain": 'The best and the worst single week in the history, and how often a week ended up rather than down. Even excellent investments are down in about four weeks out of ten: a bad week is normal, not a warning sign.',
                 "labels": ["Best week", "Worst week", "Positive weeks"],
                 "meaning": "The extremes of weekly performance and how often a week ended with a gain.",
                 "computed": "Highest and lowest weekly return; share of weeks with a return above zero.",
@@ -133,6 +141,7 @@ SECTIONS = [
             {
                 "anchor": "calendar-years",
                 "title": "Calendar-year returns",
+                "plain": 'What you would have read on each yearly statement. It shows that a good average can hide some painful years.',
                 "labels": ["Calendar years"],
                 "meaning": "The return of each calendar year, as it would appear on a yearly statement.",
                 "computed": "Last price of the year / last price of the previous year − 1. First and last years are partial.",
@@ -141,6 +150,7 @@ SECTIONS = [
             {
                 "anchor": "rolling-return",
                 "title": "Rolling 52-week return",
+                "plain": 'For every date, the gain or loss you would have made if you had invested exactly one year before. The lowest point is the worst one-year experience an investor has actually had.',
                 "labels": ["Rolling return"],
                 "meaning": "The return of the previous twelve months, recomputed every week.",
                 "computed": "Price / price 52 weeks earlier − 1, for every week.",
@@ -152,6 +162,7 @@ SECTIONS = [
             {
                 "anchor": "relative-performance",
                 "title": "Relative performance",
+                "plain": 'A race between the investment and its yardstick. When the line goes up, the investment is pulling ahead; when it goes down, it is falling behind.',
                 "labels": ["Relative performance"],
                 "meaning": "Whether the instrument (or portfolio) is pulling ahead of its benchmark or falling behind.",
                 "computed": "Instrument price / benchmark price, rebased to 100 at the start.",
@@ -169,6 +180,7 @@ SECTIONS = [
             {
                 "anchor": "volatility",
                 "title": "Volatility",
+                "plain": 'How bumpy the ride is. With 15% volatility, ending a normal year 15% above or below the average is common; twice that (±30%) happens roughly once every twenty years — in reality somewhat more often.',
                 "labels": ["Volatility (ann.)", "Volatility", "Rolling volatility"],
                 "meaning": (
                     "How much returns swing around their average: the most common measure of risk. Higher volatility "
@@ -185,6 +197,7 @@ SECTIONS = [
             {
                 "anchor": "bootstrap-volatility",
                 "title": "Bootstrap volatility (median and 5%–95% range)",
+                "plain": 'How sure we are about the volatility figure. A narrow range (15–17%) means we can trust it; a wide range (10–25%) means the history is too short or too unusual to be sure.',
                 "labels": ["Bootstrap vol (median)", "Bootstrap vol 5%", "Bootstrap vol 95%"],
                 "meaning": (
                     "How precisely volatility is known. History is only one sample of what could have happened; "
@@ -203,6 +216,7 @@ SECTIONS = [
             {
                 "anchor": "downside-deviation",
                 "title": "Downside deviation",
+                "plain": 'Like volatility, but counting only the bad weeks. Most people mind losses much more than surprises on the upside: this measures only the part that hurts.',
                 "labels": ["Downside deviation"],
                 "meaning": "Volatility that only counts bad weeks, i.e. weeks below the risk-free rate.",
                 "computed": "Root-mean-square of weekly returns below the risk-free rate (others count as zero) × √52.",
@@ -214,6 +228,7 @@ SECTIONS = [
             {
                 "anchor": "max-drawdown",
                 "title": "Maximum drawdown and recovery",
+                "plain": "The worst fall from a peak to a low — what someone who bought at the very top would have seen before things recovered. −40% means 10'000 became 6'000 at the worst moment. Ask yourself: would I have held on?",
                 "labels": ["Max drawdown", "Max drawdown trough", "Recovery (weeks)", "Drawdown"],
                 "meaning": (
                     "The largest fall from a previous peak: the worst loss an investor who bought at the top would "
@@ -233,6 +248,7 @@ SECTIONS = [
             {
                 "anchor": "var-es-historical",
                 "title": "Value at Risk and Expected Shortfall (historical, 1 week)",
+                "plain": "Think of twenty ordinary weeks. The weekly VaR is roughly the loss of the worst of them — a bad week that comes about once every twenty weeks, i.e. two or three times a year. The weekly expected shortfall is the average loss in those bad weeks: 'when a bad week comes, how much do I lose on average?'.",
                 "labels": ["VaR (1w, hist.)", "ES (1w, hist.)"],
                 "meaning": (
                     "VaR: a loss that is not exceeded in most weeks (95% by default). Expected Shortfall (ES): the "
@@ -250,6 +266,7 @@ SECTIONS = [
             {
                 "anchor": "var-es-garch",
                 "title": "Forward-looking VaR and ES (GARCH Monte Carlo)",
+                "plain": "Imagine twenty possible next years, from the worst to the best. The 1-year VaR is about the loss in the worst of those twenty — a bad year that happens roughly once every 20 years. The 1-year expected shortfall is the average loss in such bad years: an ES of −28% means that in a once-in-20-years bad year you should expect to lose around 28% of the money, sometimes more. At 99% the same reading applies to a once-in-a-century year. Unlike the other figures, it starts from today's market mood: when markets are nervous, it gets worse.",
                 "labels": ["Forward-looking risk", "VaR", "ES", "Expected shortfall 1y"],
                 "meaning": (
                     "Tail risk for the next week, month and year given today's market conditions, rather than the "
@@ -281,6 +298,7 @@ SECTIONS = [
             {
                 "anchor": "skewness-kurtosis",
                 "title": "Skewness and excess kurtosis",
+                "plain": "Whether surprises are balanced. Negative skewness: the big surprises tend to be bad ones. High kurtosis: extreme weeks — very good or very bad — happen more often than 'normal' statistics would suggest.",
                 "labels": ["Skewness", "Excess kurtosis"],
                 "meaning": (
                     "The shape of the return distribution. Negative skewness: large losses are more frequent than "
@@ -302,6 +320,7 @@ SECTIONS = [
             {
                 "anchor": "sharpe-ratio",
                 "title": "Sharpe ratio",
+                "plain": 'How much you were paid for the stress you went through. It compares the extra gain over a savings account with the bumpiness of the ride. Around 0.3–0.5 is typical for a stock market over the long run; above 1 is exceptional.',
                 "labels": ["Sharpe ratio"],
                 "meaning": "Return earned above a risk-free deposit per unit of volatility: the reward for each unit of risk taken.",
                 "computed": "(annualised return − risk-free rate) / volatility.",
@@ -313,6 +332,7 @@ SECTIONS = [
             {
                 "anchor": "sortino-ratio",
                 "title": "Sortino ratio",
+                "plain": 'Same idea as the Sharpe ratio, but only the painful bumps (losses) count as stress. Higher is better.',
                 "labels": ["Sortino ratio"],
                 "meaning": "Like the Sharpe ratio, but only penalises downside volatility.",
                 "computed": "(annualised return − risk-free rate) / downside deviation.",
@@ -321,6 +341,7 @@ SECTIONS = [
             {
                 "anchor": "calmar-ratio",
                 "title": "Calmar ratio",
+                "plain": 'Yearly gain compared with the worst fall. 0.5 means it took about two average years of gains to make up for the worst drop.',
                 "labels": ["Calmar ratio"],
                 "meaning": "Annual return per unit of the worst loss suffered.",
                 "computed": "Annualised return / maximum drawdown.",
@@ -338,6 +359,7 @@ SECTIONS = [
             {
                 "anchor": "tracking-error",
                 "title": "Tracking error",
+                "plain": 'How far the investment wanders from its yardstick. Close to 0%: it copies the yardstick. Above 6%: it behaves very differently, so the yardstick may not be a fair comparison.',
                 "labels": ["Tracking error"],
                 "meaning": "How far the instrument's returns stray from the benchmark's: the volatility of the difference.",
                 "computed": "Standard deviation of (weekly instrument return − weekly benchmark return) × √52.",
@@ -349,6 +371,7 @@ SECTIONS = [
             {
                 "anchor": "information-ratio",
                 "title": "Information ratio",
+                "plain": 'How regularly the investment beats its yardstick, not just by how much. Above 0.5 over several years is good work for an active manager.',
                 "labels": ["Information ratio"],
                 "meaning": "Excess return over the benchmark per unit of tracking error: how consistently the instrument beats it.",
                 "computed": "(annualised return − benchmark annualised return) / tracking error.",
@@ -360,6 +383,7 @@ SECTIONS = [
             {
                 "anchor": "beta",
                 "title": "Beta",
+                "plain": 'How strongly the investment reacts when its yardstick moves. Beta 1: it moves the same; 1.2: 20% stronger (both up and down); 0.5: half as much — calmer.',
                 "labels": ["Beta"],
                 "meaning": "Sensitivity to the benchmark: how much the instrument tends to move when the benchmark moves by 1%.",
                 "computed": "Covariance of weekly returns with the benchmark / variance of the benchmark.",
@@ -368,6 +392,7 @@ SECTIONS = [
             {
                 "anchor": "alpha",
                 "title": "Alpha (Jensen)",
+                "plain": 'The extra gain that is not explained by simply following the market. Positive alpha: the choices made added value.',
                 "labels": ["Alpha (Jensen, ann.)"],
                 "meaning": "The part of the return not explained by exposure to the benchmark: value added (or lost) after accounting for beta.",
                 "computed": "(return − risk-free) − beta × (benchmark return − risk-free), annualised.",
@@ -376,6 +401,7 @@ SECTIONS = [
             {
                 "anchor": "correlation",
                 "title": "Correlation",
+                "plain": 'Whether two investments tend to move together. +1: always in the same direction; 0: unrelated; negative: one tends to rise when the other falls — which is exactly what protects a portfolio.',
                 "labels": ["Correlation"],
                 "meaning": "How closely two sets of returns move together, from −1 (opposite) to +1 (in lockstep).",
                 "computed": "Pearson correlation of weekly returns.",
@@ -387,6 +413,7 @@ SECTIONS = [
             {
                 "anchor": "capture-ratios",
                 "title": "Up capture and down capture",
+                "plain": "How much of the yardstick's good and bad weeks the investment experienced. The ideal: catch more than 100% of the good weeks and less than 100% of the bad ones.",
                 "labels": ["Up capture", "Down capture"],
                 "meaning": "How much of the benchmark's rises and falls the instrument has captured.",
                 "computed": (
@@ -401,6 +428,7 @@ SECTIONS = [
             {
                 "anchor": "weeks-outperforming",
                 "title": "Weeks outperforming",
+                "plain": 'In how many weeks out of a hundred the investment did better than its yardstick. Around 50 is normal; consistently above 55 is a sign of skill.',
                 "labels": ["Weeks outperforming"],
                 "meaning": "The share of weeks in which the instrument did better than its benchmark.",
                 "computed": "Count of weeks with instrument return > benchmark return / number of weeks.",
@@ -415,6 +443,7 @@ SECTIONS = [
             {
                 "anchor": "rebalancing",
                 "title": "Drift vs rebalancing",
+                "plain": 'Drift: you buy once and never touch it; what grows becomes a bigger part of the portfolio. Rebalancing: you regularly trim what grew and top up what fell to come back to your chosen mix — keeping the level of risk you decided on.',
                 "labels": ["Rebalancing"],
                 "meaning": (
                     "Drift (buy and hold): positions are never traded, so winners grow into a larger share of the "
@@ -433,6 +462,7 @@ SECTIONS = [
             {
                 "anchor": "late-entry",
                 "title": "Instruments without data at the start",
+                "plain": 'Some investments did not exist yet at the start date. Until they appear, the money is spread over the others; the early years therefore describe a slightly different portfolio from yours.',
                 "labels": ["Late entry"],
                 "meaning": "When the backtest starts before an instrument existed, that instrument cannot be held yet.",
                 "computed": (
@@ -445,6 +475,7 @@ SECTIONS = [
             {
                 "anchor": "composite-benchmark",
                 "title": "Composite benchmark",
+                "plain": "A do-it-yourself 'passive version' of your portfolio: same mix, but each investment replaced by its yardstick. If your portfolio beats it, your choices added value.",
                 "labels": ["Benchmark"],
                 "meaning": "The same allocation invested in each instrument's benchmark: what a passive version of your portfolio would have done.",
                 "computed": (
@@ -460,6 +491,7 @@ SECTIONS = [
             {
                 "anchor": "fees",
                 "title": "Fees and turnover",
+                "plain": 'What it costs to run the portfolio. Fees look small but add up: 1% a year takes away about 10% of the final amount over ten years.',
                 "labels": ["Annualised turnover", "Total fees paid (% of start)", "Number of rebalances",
                            "Management fee", "Transaction cost"],
                 "meaning": "The cost of running the portfolio.",
@@ -476,6 +508,7 @@ SECTIONS = [
             {
                 "anchor": "attribution",
                 "title": "Return attribution",
+                "plain": 'Which investments made the money and which lost it, adding up exactly to the total result.',
                 "labels": ["Return attribution"],
                 "meaning": "Which lines made (or lost) the money.",
                 "computed": (
@@ -487,6 +520,7 @@ SECTIONS = [
             {
                 "anchor": "weights-over-time",
                 "title": "Weights over time",
+                "plain": 'How the share of each investment changed over time. Without rebalancing, the winners slowly take over the portfolio.',
                 "labels": ["Allocation over time"],
                 "meaning": "How the share of each instrument in the portfolio evolved.",
                 "computed": "Weights after each week's market moves and trades.",
@@ -501,6 +535,7 @@ SECTIONS = [
             {
                 "anchor": "ledoit-wolf",
                 "title": "Correlation matrix (Ledoit-Wolf)",
+                "plain": 'A table showing which investments move together (red), independently (white) or in opposite directions (blue). Red pairs will tend to fall together in a crisis; blue pairs cushion each other.',
                 "labels": ["Correlation matrix", "Correlation and diversification"],
                 "meaning": "How each pair of instruments moves together; low or negative correlations are what make diversification work.",
                 "computed": (
@@ -517,6 +552,7 @@ SECTIONS = [
             {
                 "anchor": "portfolio-volatility",
                 "title": "Portfolio volatility and weighted average volatility",
+                "plain": 'How bumpy the whole portfolio is, compared with how bumpy it would be if all its pieces moved exactly together. The difference is the protection you get from mixing different investments.',
                 "labels": ["Portfolio volatility", "Weighted avg. volatility"],
                 "meaning": (
                     "Portfolio volatility is the risk of the whole; the weighted average volatility is what the risk "
@@ -528,6 +564,7 @@ SECTIONS = [
             {
                 "anchor": "diversification-ratio",
                 "title": "Diversification ratio",
+                "plain": 'How much mixing investments reduces the bumps. 1: no benefit at all. 1.3: the portfolio is about a quarter calmer than its pieces would suggest.',
                 "labels": ["Diversification ratio"],
                 "meaning": "How much diversification reduces risk.",
                 "computed": "Weighted average volatility / portfolio volatility.",
@@ -536,6 +573,7 @@ SECTIONS = [
             {
                 "anchor": "effective-bets",
                 "title": "Effective number of bets and of holdings",
+                "plain": 'How many really different risks you hold. Ten funds that all go up and down with the stock market are, in practice, about one bet — not ten.',
                 "labels": ["Effective nb of bets", "Effective nb of holdings"],
                 "meaning": (
                     "How many truly independent sources of risk the portfolio holds (bets), and how many equally "
@@ -553,6 +591,7 @@ SECTIONS = [
             {
                 "anchor": "average-correlation",
                 "title": "Average correlation",
+                "plain": 'How much the investments in your portfolio move alike, on average. Close to 1: they all move together, little protection. Below 0.3: they balance each other well.',
                 "labels": ["Avg. correlation", "Avg. pairwise correlation"],
                 "meaning": "The typical correlation between two lines of the portfolio, weighted by their size.",
                 "computed": "Weight-weighted average of the off-diagonal Ledoit-Wolf correlations.",
@@ -561,6 +600,7 @@ SECTIONS = [
             {
                 "anchor": "risk-contribution",
                 "title": "Risk contribution",
+                "plain": 'Which investments are responsible for the ups and downs. A small slice of shares can cause most of the swings of a portfolio that is mostly bonds.',
                 "labels": ["Risk contribution", "Weight vs share of portfolio risk"],
                 "meaning": "The share of the portfolio's ups and downs that comes from each line.",
                 "computed": "Euler decomposition: wᵢ × (Σw)ᵢ / portfolio variance; the shares add up to 100%.",
@@ -578,6 +618,7 @@ SECTIONS = [
             {
                 "anchor": "monte-carlo",
                 "title": "Monte Carlo simulation",
+                "plain": 'Instead of one forecast, the app imagines thousands of possible futures. The dark band is where half of them end up; the light band holds nine out of ten. One future in ten falls outside it.',
                 "labels": ["Projected wealth", "Number of simulations", "Student-t"],
                 "meaning": "Thousands of possible futures, to see the range of outcomes rather than a single forecast.",
                 "computed": (
@@ -593,6 +634,7 @@ SECTIONS = [
             {
                 "anchor": "expected-return",
                 "title": "Expected return (your input)",
+                "plain": 'Your own guess of how much each investment will grow per year in the long run. The past is shown only as a reminder — it is not a promise.',
                 "labels": ["Expected return % p.a."],
                 "meaning": "What you assume each instrument will earn per year in the base currency, dividends included.",
                 "computed": "It sets each instrument's median yearly growth in the simulation; risk comes from history.",
@@ -604,6 +646,7 @@ SECTIONS = [
             {
                 "anchor": "cash-flows",
                 "title": "Cash flow plan",
+                "plain": 'Money you plan to add (savings) or take out (a pension, a big purchase). Investing a fixed amount every month buys more when prices are low and less when they are high, which smooths the purchase price.',
                 "labels": ["Cash flow plan", "Regular monthly investment"],
                 "meaning": "Planned contributions (+) and withdrawals (−), e.g. a monthly savings plan or retirement income.",
                 "computed": (
@@ -623,6 +666,7 @@ SECTIONS = [
             {
                 "anchor": "final-wealth",
                 "title": "Final wealth (median, percentiles, mean)",
+                "plain": 'What the portfolio could be worth at the end. Plan on the median (half of the futures do better, half worse) and make sure you could live with the 5th percentile (one bad future in twenty).',
                 "labels": ["Median final wealth", "Median terminal wealth", "Mean terminal wealth", "5th percentile",
                            "95th percentile", "Net amount invested"],
                 "meaning": "The distribution of the portfolio value at the end of the horizon.",
@@ -638,6 +682,7 @@ SECTIONS = [
             {
                 "anchor": "forecast-probabilities",
                 "title": "Probabilities: target, loss, running out",
+                "plain": 'The share of imagined futures in which something happens: reaching your goal, ending with less than you put in, or running out of money.',
                 "labels": ["Chance of reaching target", "Chance of ending below invested", "Chance of running out",
                            "P(reaching target)", "P(ending below amount invested)", "P(depletion)"],
                 "meaning": "The share of simulated futures in which each event happens.",
@@ -650,6 +695,7 @@ SECTIONS = [
             {
                 "anchor": "forecast-return-risk",
                 "title": "Median return and drawdowns in the forecast",
+                "plain": 'The typical yearly growth in the simulated futures, and the falls you should be ready to sit through along the way.',
                 "labels": ["Median return p.a.", "Median annualised return (TWR)", "Median max drawdown",
                            "Max drawdown (95th pct)", "Expected shortfall (worst 5%)"],
                 "meaning": "The typical yearly return and the losses to expect along the way.",
@@ -662,6 +708,7 @@ SECTIONS = [
             {
                 "anchor": "real-terms",
                 "title": "Today's money (inflation-adjusted)",
+                "plain": "Shows future amounts in today's money: what they will really buy once prices have risen. With 2% inflation, 100'000 in twenty years buys what about 67'000 buys today.",
                 "labels": ["Inflation", "Show in today's money"],
                 "meaning": "Future amounts expressed in today's purchasing power.",
                 "computed": "Each value is divided by (1 + inflation)^years.",
@@ -696,9 +743,12 @@ def url(key: str) -> str | None:
 
 
 def short(key: str) -> str:
+    """Tooltip text: the plain-language explanation (falls back to the first sentence of 'meaning')."""
     e = entry(key)
     if not e or not e["meaning"]:
         return ""
+    if e.get("plain"):
+        return e["plain"]
     first = e["meaning"].split(". ")[0].rstrip(".")
     return first + "."
 
@@ -708,4 +758,4 @@ def help_text(key: str) -> str | None:
     e = entry(key)
     if not e or not e["meaning"]:
         return None
-    return f"{short(key)}\n\n[What it means and how to read it ↗]({url(key)})"
+    return f"{short(key)}\n\n[More detail ↗]({url(key)})"

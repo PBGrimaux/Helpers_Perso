@@ -7,7 +7,7 @@ from ui.glossary import SECTIONS
 
 page_header(
     "Methodology",
-    "What every number means for an investor, how it is computed, and how to read it.",
+    "What every number means — first in plain words, then how it is computed and how a professional reads it.",
 )
 note("Opened from an ⓘ link? Your analysis is still open in the other tab.")
 
@@ -23,6 +23,7 @@ for sec in SECTIONS:
     st.header(sec["title"], anchor=sec["anchor"], divider="gray")
     for e in sec["entries"]:
         st.subheader(e["title"], anchor=e["anchor"])
+        st.info(e["plain"], icon=":material/lightbulb:")
         st.markdown(
             f"**What it tells you.** {e['meaning']}\n\n"
             f"**How it is computed.** {e['computed']}\n\n"
