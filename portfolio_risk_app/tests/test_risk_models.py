@@ -64,3 +64,43 @@ def test_diversification_measures():
     assert dv.effective_number_of_bets(w, cov) == pytest.approx(2.0)
     assert dv.effective_number_of_holdings(w) == pytest.approx(2.0)
     assert dv.average_correlation(w, corr) == pytest.approx(0.0)
+
+
+def test_garch_es_ignores_drift_and_exceeds_volatility():
+    """A strong upward trend must not shrink the 1-year tail risk (the old bug)."""
+    rng = np.random.default_rng(8)
+    nu, sigma_w = 5, 0.16 / np.sqrt(52)
+    r = 0.20 / 52 + rng.standard_t(nu, 1200) * sigma_w * np.sqrt((nu - 2) / nu)
+    idx = pd.date_range("2000-01-07", periods=len(r), freq="W-FRI")
+    p = pd.Series(100 * np.exp(np.cumsum(r)), idx)
+    out = rm.garch_t_es(p, level=0.95)
+    t = out["table"]
+    assert out["params"]["drift_removed_ann"] == pytest.approx(0.20, abs=0.04)
+    vol_1y = t.loc["1 year", "Volatility"]
+    assert vol_1y == pytest.approx(0.16, rel=0.25)
+    assert t.loc["1 year", "ES"] > 1.5 * vol_1y          # ~2σ in log terms, less once converted to % loss
+    assert (t["ES"] >= t["VaR"]).all()
+    assert t["ES"].is_monotonic_increasing                # longer horizon, larger tail loss
+
+
+def test_simulate_garch_without_arch_terms_is_iid():
+    sims = rm.simulate_garch_t(omega=0.0004, alpha=0.0, beta=0.0, nu=6, sigma2_0=0.0004,
+                               horizon=10, n_sims=50_000, rng=np.random.default_rng(1))
+    assert sims.std() == pytest.approx(0.02, rel=0.03)
+
+
+def test_simulate_garch_propagates_shocks():
+    """With alpha > 0 a big first-week shock raises the next week's volatility."""
+    sims = rm.simulate_garch_t(omega=1e-5, alpha=0.3, beta=0.6, nu=8, sigma2_0=4e-4,
+                               horizon=2, n_sims=50_000, rng=np.random.default_rng(2))
+    big = np.abs(sims[:, 0]) > np.quantile(np.abs(sims[:, 0]), 0.9)
+    assert sims[big, 1].std() > 1.3 * sims[~big, 1].std()
+
+
+def test_ledoit_wolf_single_column_and_read_only_input():
+    rng = np.random.default_rng(3)
+    X = pd.DataFrame({"A": rng.normal(0, 0.02, 200)})
+    X.values.setflags(write=False)
+    lw = rm.ledoit_wolf(X)
+    assert lw["corr"].iloc[0, 0] == 1.0
+    assert lw["cov"].iloc[0, 0] == pytest.approx(X["A"].var(ddof=0) * 52, rel=0.05)

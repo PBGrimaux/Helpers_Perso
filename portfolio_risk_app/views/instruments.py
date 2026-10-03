@@ -143,7 +143,7 @@ note(f"Weekly data. Volatility annualised with √52. Bootstrap vol: stationary 
      f"(4-week blocks, 1,000 resamples), median and 90% interval. Historical VaR/ES at {level:.1%} on weekly returns.")
 
 # ── forward-looking risk ─────────────────────────────────────────────────
-section("Forward-looking risk (GARCH Monte Carlo)", "var-es-garch")
+section("Forward-looking risk (GARCH Monte Carlo, drift removed)", "var-es-garch")
 with st.spinner("Fitting GARCH(1,1)-t and simulating 10,000 paths…"):
     g_p = cache.garch_es(p_full, level)
     g_b = cache.garch_es(b_full, level) if b_full is not None else None
@@ -154,13 +154,21 @@ for col, name, g in zip(cols, [sym, bsym], [g_p, g_b]):
     with col:
         st.markdown(f"**{name}** · {g['method']}")
         if len(g["table"]):
-            show_table(g["table"].map(lambda v: f"{v:.1%}"))
+            tbl = g["table"].rename(columns={"VaR": f"VaR {level:.1%}", "ES": f"ES {level:.1%}",
+                                             "Volatility": "Volatility over horizon"})
+            show_table(tbl.map(lambda v: f"{v:.1%}"))
         prm = g.get("params") or {}
-        if prm:
-            note(f"Today's volatility {prm['current_vol_ann']:.1%} p.a. vs long-run {prm['long_run_vol_ann']:.1%} · "
-                 f"persistence {prm['persistence']:.3f} · Student-t ν = {prm['nu']:.1f}")
-note(f"VaR = loss not exceeded with {level:.1%} probability; ES = average loss beyond the VaR. "
-     "Conditional on today's volatility, so it moves with market stress.")
+        parts = []
+        if "drift_removed_ann" in prm:
+            parts.append(f"average trend removed: {prm['drift_removed_ann']:+.1%} p.a.")
+        if "nu" in prm:
+            parts.append(f"today's volatility {prm['current_vol_ann']:.1%} p.a. vs long-run {prm['long_run_vol_ann']:.1%}")
+            parts.append(f"persistence {prm['persistence']:.3f} · Student-t ν = {prm['nu']:.1f}")
+        if parts:
+            note(" · ".join(parts).capitalize())
+note(f"VaR = loss not exceeded with {level:.1%} probability; ES = average loss beyond the VaR, both as a % loss. "
+     "The average trend is removed so that the risk is not offset by past gains; the simulation starts from "
+     "today's volatility, so these numbers move with market stress.")
 
 excel_button(
     {"Prices (rebased)": pd.DataFrame(series), "Returns by horizon": ret_table, "Metrics": abs_df,

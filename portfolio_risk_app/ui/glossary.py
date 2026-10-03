@@ -256,16 +256,26 @@ SECTIONS = [
                     "average of the past."
                 ),
                 "computed": (
-                    "A GARCH(1,1) model with Student-t shocks is fitted to weekly log returns. It captures volatility "
-                    "clustering (turbulent weeks tend to follow turbulent weeks) and fat tails. Starting from today's "
-                    "estimated volatility, 10,000 future paths are simulated with Student-t draws; VaR and ES are "
-                    "read from the simulated 1-week, 1-month and 1-year returns. With less than two years of data, "
-                    "past returns are resampled instead."
+                    "1) **Remove the drift.** Weekly log returns minus their average: only the fluctuations, i.e. the "
+                    "risk, are kept. Otherwise a strong past trend would add +10–15% of expected gain over a year and "
+                    "hide most of the potential loss. "
+                    "2) **Fit a GARCH(1,1) with Student-t shocks** on those returns: next week's variance = ω + α × "
+                    "(this week's return)² + β × this week's variance. It captures volatility clustering (turbulent "
+                    "weeks follow turbulent weeks) and fat tails (ν degrees of freedom). "
+                    "3) **Monte Carlo.** 10,000 paths of 52 weeks start from today's volatility forecast; each week a "
+                    "Student-t shock is drawn, the simulated return is volatility × shock, and that return feeds the "
+                    "variance of the following week — a crash raises the risk of the weeks after it. "
+                    "4) **Read the tail.** Over 1 week, 1 month and 1 year: return = exp(sum of weekly log returns) − 1; "
+                    "VaR = the loss exceeded in 5% of paths (at 95%), ES = the average loss in those worst 5%. "
+                    "With less than two years of data, or if the fitted process is not stable (α + β ≥ 1), "
+                    "de-drifted past returns are resampled instead."
                 ),
                 "reading": (
-                    "When markets are stressed, today's volatility is above its long-run level and these numbers rise "
-                    "above the historical ones; in calm markets they are lower. 'Persistence' close to 1 means shocks "
-                    "fade slowly; a low ν (degrees of freedom) means fat tails."
+                    "Without drift, the 1-year ES at 95% is typically around 1.7–2 times the yearly volatility "
+                    "(in % loss). When markets are stressed, today's volatility is above its long-run level and these "
+                    "numbers rise above the historical ones; in calm markets they are lower. 'Persistence' (α + β) "
+                    "close to 1 means shocks fade slowly; a low ν means fat tails. The volatility over the horizon is "
+                    "shown next to VaR and ES so they can be compared on the same scale."
                 ),
             },
             {
